@@ -1,0 +1,14 @@
+*.aux
+*.cfg
+*.log
+*.old
+*.out
+*.pmap
+*.pdf
+*.tex
+
+*/*.toolbox/*/*.tla
+
+.project
+.settings
+MC.tla

@@ -1,0 +1,42 @@
+#!/bin/bash
+
+programname=$0
+
+function usage {
+    echo "usage: $programname spec_file.tla old_name new_name"
+    exit 1
+}
+
+if [ ${#@} != 3 ]; then
+    usage;
+fi
+
+if [ ! -f $1 ]; then
+    echo "No such TLA file $1"
+    exit 1
+fi
+
+DIR=$(dirname $1)
+TLA_FILE=$(basename $1)
+SPEC_NAME=${TLA_FILE%.tla}
+TOOLBOX=$DIR/$SPEC_NAME.toolbox
+
+if [ ! -d $TOOLBOX ]; then
+    echo "No toolbox $TOOLBOX"
+    exit 1
+fi
+
+MODEL_PATH=$TOOLBOX/$SPEC_NAME"___"$2.launch
+NEW_MODEL_PATH=$TOOLBOX/$SPEC_NAME"___"$3.launch
+
+if [ ! -f $MODEL_PATH ]; then
+    echo "No such model file $MODEL_PATH"
+    exit 1
+fi
+
+echo "Renaming $2 to $3"
+
+sed -i "s/<stringAttribute key=\"configurationName\" value=\"$2\"\/>/<stringAttribute key=\"configurationName\" value=\"$3\"\/>/" $MODEL_PATH
+
+mv $MODEL_PATH $NEW_MODEL_PATH
+

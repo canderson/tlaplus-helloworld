@@ -1,0 +1,44 @@
+#!/bin/bash
+
+programname=$0
+
+function usage {
+    echo "usage: $programname spec_file.tla new_name"
+    exit 1
+}
+
+if [ ${#@} != 2 ]; then
+    usage;
+fi
+
+if [ ! -f $1 ]; then
+    echo "No such TLA file $1"
+    exit 1
+fi
+
+DIR=$(dirname $1)
+OLD_TLA_FILE=$(basename $1)
+OLD_NAME=${OLD_TLA_FILE%.tla}
+OLD_TOOLBOX=$DIR/$OLD_NAME.toolbox
+
+if [ ! -d $OLD_TOOLBOX ]; then
+    echo "No toolbox $OLD_TOOLBOX (Hint: You can probably create an empty directory.)"
+    exit 1
+fi
+
+NEW_TOOLBOX=$DIR/$2.toolbox
+
+echo "Renaming $OLD_NAME to $2"
+
+sed -i "s/-- MODULE $OLD_NAME --/-- MODULE $2 --/" $1
+
+mv $1 $DIR/$2.tla
+
+mv $DIR/$OLD_NAME.toolbox $NEW_TOOLBOX
+
+for launch_file in `find $NEW_TOOLBOX -type f -regex ".*\.launch$"`
+do
+    launch_file_name=$(basename $launch_file)
+    sed -i "s/<stringAttribute key=\"specName\" value=\"$OLD_NAME\"\/>/<stringAttribute key=\"specName\" value=\"$2\"\/>/" $launch_file
+    mv $launch_file $NEW_TOOLBOX/$2${launch_file_name#$OLD_NAME}
+done

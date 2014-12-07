@@ -1,0 +1,5 @@
+#!/bin/bash
+
+TOOLBOX_DIR=$HOME/bin/tla-toolbox-dir
+cd $TOOLBOX_DIR
+./toolbox
